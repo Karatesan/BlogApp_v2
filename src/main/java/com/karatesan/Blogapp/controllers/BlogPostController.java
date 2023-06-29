@@ -1,9 +1,11 @@
 package com.karatesan.Blogapp.controllers;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.karatesan.Blogapp.model.BlogPostBasicDTO;
 import com.karatesan.Blogapp.model.BlogPostDTO;
 import com.karatesan.Blogapp.model.BlogPostEntity;
 import com.karatesan.Blogapp.model.BlogPostRequest;
@@ -36,6 +40,12 @@ public class BlogPostController {
 	public List<BlogPostDTO>getAllPosts(){
 		return blogPostService.findAllBlogPosts();
 	}
+	@GetMapping("/basic")
+	public List<BlogPostBasicDTO>getAllBasicPosts(){
+		return blogPostService.findAllBasicBlogPosts();
+	}
+	
+	//metoda do zwrocenia czesci postow (pagination) + zrobic osobny request zawierajacy tylko poster bez galerii
 	
 	@GetMapping("/{id}")
 	public BlogPostDTO getBlogPostById(@PathVariable String id) {
@@ -98,14 +108,24 @@ public class BlogPostController {
 		return blogPostService.blogPostEntityToDTO(postEntity);
 	}
 	
+	@DeleteMapping("/{id}")
+	public void deletePost(@PathVariable String id) {
+		blogPostService.deletePost(id);
+	}
+	
 	@PutMapping
-	public BlogPostDTO updatePost(@RequestParam("title") String title, 
+	public BlogPostDTO updatePost(
+			  @RequestParam("id") String id,
+			  @RequestParam("title") String title, 
+			  @RequestParam("blogDate")LocalDateTime blogDate,
 			   @RequestParam("content")String content, 
-			   @RequestParam("newIages")List<MultipartFile> newIages,
-			   @RequestParam("deletedIndexes")List<Integer>deletedIndexes) {
+			   @RequestParam(value = "newImages", required = false)List<MultipartFile> newImages,
+			   @RequestParam(value ="deletedIndexes", required = false)List<Integer>deletedIndexes) {
+		
+		
 		System.out.println("jestem tu gdzie patrzwe kontroler/nfgsdfsd/nfdsfsdfsd");
 
-		//BlogPostEntity postToUpdate = blogPostService.updateBlogPost(blogPostService.blogPostRequestToEntity(updatedPost));
-		return null;	
+		BlogPostEntity postToUpdate = blogPostService.updateBlogPost(id, title,content,blogDate,newImages,deletedIndexes);
+		return blogPostService.blogPostEntityToDTO(postToUpdate);
 	}
 }

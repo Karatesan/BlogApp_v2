@@ -31,7 +31,7 @@ const ImageUploader = ({
             onClick={() => deleteImage(index)}
           >
             <img
-              src={"data:image/webp;base64," + image}
+              src={image}
               alt={`Image ${index}`}
               className=" w-[100px] h-[100px] object-contain my-4"
             />

@@ -3,7 +3,7 @@ import { navLinks } from "../constans/constans";
 
 const Header = () => {
   return (
-    <header className="flex flex-row justify-between w-full font-poppins text-white header-background ">
+    <header className="flex flex-row justify-between w-full font-poppins text-white header-background h-[15vh]">
       <div className="titleContainer flex p-5">
         <div className="flex items-center">
           <img src="src\assets\logo.png" className="w-60px] h-[60px] m-1" />

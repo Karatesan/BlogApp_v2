@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ImageUploader from "./ImageUploader";
 
 const initialData = {
@@ -26,14 +26,24 @@ const UpdatePost = () => {
         title: post.title,
         content: post.content,
         blogDate: post.blogDate,
-        images: post.images,
-        newImages: [],
+        images: post.images, //base64 string
+        newImages: [], //file
         deletedIndexes: [],
       };
       setUpdatedPost(postData);
     };
     getPostById();
   }, [id]);
+
+  const createUrls = () => {
+    const base64images = updatedPost.images.map(
+      (image) => "data:image/webp;base64," + image
+    );
+    const fileImages = updatedPost.newImages.map((image) =>
+      URL.createObjectURL(image)
+    );
+    return [...base64images, ...fileImages];
+  };
 
   const handleSelectedItems = (event) => {
     const files = event.target.files;
@@ -45,9 +55,20 @@ const UpdatePost = () => {
   };
 
   const deleteImage = (index) => {
-    const updatedImages = [...updatedPost.images];
-    updatedImages.splice(index, 1);
-    setUpdatedPost({ ...updatedPost, images: [...updatedImages] });
+    const firstLength = updatedPost.images.length;
+    if (index < firstLength) {
+      const updatedImages = [...updatedPost.images];
+      updatedImages.splice(index, 1);
+      setUpdatedPost({
+        ...updatedPost,
+        images: [...updatedImages],
+        deletedIndexes: [...updatedPost.deletedIndexes, index],
+      });
+    } else {
+      const updatedImages = [...updatedPost.newImages];
+      updatedImages.splice(index - firstLength, 1);
+      setUpdatedPost({ ...updatedPost, newImages: [...updatedImages] });
+    }
   };
 
   const handleChange = (event) => {
@@ -58,14 +79,38 @@ const UpdatePost = () => {
     }));
   };
 
+  const handleDelete = () => {
+    fetch(`/api/blogpost/${updatedPost.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).catch((error) => {
+      console.log(error);
+    });
+  };
+
   const handleUploadPost = async (event) => {
     event.preventDefault();
-    console.log(updatedPost.newImages);
     try {
+      const formData = new FormData();
+      updatedPost.newImages.forEach((image) => {
+        formData.append("newImages", image);
+      });
+      updatedPost.deletedIndexes.forEach((deletedI) =>
+        formData.append("deletedIndexes", deletedI)
+      );
+      formData.append("id", updatedPost.id);
+      formData.append("title", updatedPost.title);
+      formData.append("content", updatedPost.content);
+      formData.append("blogDate", updatedPost.blogDate);
+
+      for (const entry of formData.entries()) {
+        console.log(entry[0], entry[1]);
+      }
       const response = await fetch("/api/blogpost", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedPost),
+        body: formData,
       });
 
       // Handle the response as needed
@@ -80,7 +125,7 @@ const UpdatePost = () => {
       <div className="flex flex-col items-center">
         <h1 className="font-poppins text-[24px] mb-4">Update Post</h1>
         <ImageUploader
-          selectedImages={updatedPost.images}
+          selectedImages={createUrls()}
           handleSelectedItems={handleSelectedItems}
           deleteImage={deleteImage}
         />
@@ -117,6 +162,19 @@ const UpdatePost = () => {
             Update
           </button>
         </form>
+        <Link to={"/"}>
+          <button className="mt-4 rounded-full text-violet-700 bg-violet-50 font-semibold hover:bg-violet-100 px-4 py-2">
+            Cancel
+          </button>
+        </Link>
+        <Link to={"/"}>
+          <button
+            onClick={handleDelete}
+            className="mt-4 rounded-full text-violet-700 bg-violet-50 font-semibold hover:bg-violet-100 px-4 py-2"
+          >
+            Delete Post
+          </button>
+        </Link>
       </div>
     </>
   );

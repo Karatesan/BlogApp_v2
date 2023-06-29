@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ImageUploader from "./ImageUploader";
 import Images from "./Images";
 import CreateBlogPost from "./CreateBlogPost";
 import HomeCarousel from "./HomeCarousel";
 import { Link } from "react-router-dom";
 import UpdatePost from "./UpdatePost";
+import BlogPostcCard from "./BlogPostcCard";
 
 const Home = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
+  const rowRef = useRef(1);
 
   useEffect(() => {
     const getBlogPosts = async () => {
-      const response = await fetch("/api/blogpost");
+      const response = await fetch("/api/blogpost/basic");
       const posts = await response.json();
       setBlogPosts(posts);
     };
@@ -25,8 +27,17 @@ const Home = () => {
   return (
     <>
       <HomeCarousel posts={blogPosts} key={loadingData} />
-      <CreateBlogPost />
-      
+      <div className="grid md:grid-cols-2 grid-cols-1">
+        {blogPosts.map((post, index) => {
+          const row = index % 2 === 1 ? rowRef.current++ : rowRef.current;
+          console.log(row);
+          return (
+            <div key={post.id} className="card-container">
+              <BlogPostcCard post={post} row={row} />
+            </div>
+          );
+        })}
+      </div>
     </>
   );
 };
