@@ -9,7 +9,7 @@ const BlogPostcCard = ({ post, row }) => {
       <div className="flex md:h-[400px] h-[300px] text-center">
         <div className="flex-1 ">
           <img
-            src={getBase64Url(post.poster)}
+            src={getBase64Url(post.poster.base64image)}
             className="object-cover w-[100%] h-[100%]"
           />
         </div>
@@ -34,7 +34,7 @@ const BlogPostcCard = ({ post, row }) => {
         </div>
         <div className="flex-1 ">
           <img
-            src={getBase64Url(post.poster)}
+            src={getBase64Url(post.poster.base64image)}
             className="object-cover w-[100%] h-[100%]"
           />
         </div>

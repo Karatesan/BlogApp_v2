@@ -26,7 +26,7 @@ const Home = () => {
 
   return (
     <>
-      <HomeCarousel posts={blogPosts} key={loadingData} />
+      <HomeCarousel posts={blogPosts} />
       <div className="grid md:grid-cols-2 grid-cols-1">
         {blogPosts.map((post, index) => {
           const row = index % 2 === 1 ? rowRef.current++ : rowRef.current;

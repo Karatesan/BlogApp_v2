@@ -1,5 +1,6 @@
 import React from "react";
 import { navLinks } from "../constans/constans";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -11,15 +12,16 @@ const Header = () => {
         </div>
       </div>
       <ul className="flex justify-center items-center mr-2">
-        {navLinks.map((link, index) => {
+        {navLinks.map((element, index) => {
+          const { id, title, link } = element;
           return (
             <li
-              key={link.id}
+              key={id}
               className={`cursor-pointer text-[20px] ${
                 index < navLinks.length - 1 ? "mr-10" : "mr-2"
               }`}
             >
-              {link.title}
+              <Link to={link}>{title}</Link>
             </li>
           );
         })}

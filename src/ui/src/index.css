@@ -22,6 +22,51 @@
   position: relative;
 }
 
+blockquote {
+  font-style: italic;
+  background: #f9f9f9;
+  color: gray;
+  border-left: 10px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 0.5em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+blockquote:before {
+  color: #ccc;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+}
+blockquote p {
+  display: inline;
+}
+
+/* QUILL*/
+.quill {
+  background-color: rgb(241, 240, 240);
+}
+
+.ql-editor {
+  width: 8.5in;
+  height: 400px;
+  padding: 50px;
+  margin: 1rem;
+  box-shadow: 0 0 5px black;
+  background-color: white;
+}
+
+.ql-container {
+  border: none;
+  display: flex;
+  justify-content: center;
+}
+.ql-toolbar {
+  display: flex;
+  justify-content: center;
+}
+
 .card-container::before {
   content: "";
   position: absolute;

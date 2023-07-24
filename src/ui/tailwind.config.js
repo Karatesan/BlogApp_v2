@@ -24,6 +24,13 @@ export default {
       lg: "1200px",
       xl: "1700px",
     },
+    listStyleType: {
+      none: "none",
+      disc: "disc",
+      decimal: "decimal",
+      square: "square",
+      roman: "upper-roman",
+    },
   },
   plugins: [],
 };
