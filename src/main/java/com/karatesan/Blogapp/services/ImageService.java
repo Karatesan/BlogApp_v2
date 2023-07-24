@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.karatesan.Blogapp.model.Image;
+import com.karatesan.Blogapp.model.ResponseImage;
 import com.karatesan.Blogapp.repositories.ImageRepository;
 
 @Service
@@ -22,15 +23,9 @@ public class ImageService {
         this.imageRepository = imageRepository;
     }
 
-    public Image storeImage(MultipartFile file) throws IOException {
-
-        return imageRepository.save(fileToImage(file));
-    }
-
     public Image getImageById(String id) {
         return imageRepository.findById(id).orElse(null);
-    }
-    
+    } 
     
     public List<Image> findAllImages(){
     	return imageRepository.findAll();
@@ -43,20 +38,24 @@ public class ImageService {
         Image image = new Image();
         image.setName(imageName);
         image.setData(imageData);
+        image.setSize(file.getSize());
         return image;
     }
-
     
-    public String ImageDbToBase64String(Image image) {
-
-    	return Base64.getEncoder().encodeToString(image.getData());
-    }
-    
-    public Image base64StringToImage(MultipartFile image) {
-    	
-		return null;
-    	
-    }
+	 public String getImageDataAsBase64(byte[] image) {
+		 
+	        return Base64.getEncoder().encodeToString(image);		 	 
+}
+	 
+	 public ResponseImage imageToResponseImage(Image image) {
+		 
+		 ResponseImage responseImage = new ResponseImage(image.getId(), 
+				 image.getName(), 
+				 image.getDescription(), 
+				 image.getSize(), 
+				 getImageDataAsBase64(image.getData()));
+		 return responseImage;
+}
 }
 
 

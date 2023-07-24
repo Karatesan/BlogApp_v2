@@ -1,28 +1,25 @@
 package com.karatesan.Blogapp.controllers;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.karatesan.Blogapp.model.BlogPostBasicDTO;
+import com.karatesan.Blogapp.model.BlogPostBasicResponse;
 import com.karatesan.Blogapp.model.BlogPostDTO;
 import com.karatesan.Blogapp.model.BlogPostEntity;
-import com.karatesan.Blogapp.model.BlogPostRequest;
+import com.karatesan.Blogapp.model.BlogPostResponse;
 import com.karatesan.Blogapp.services.BlogPostService;
-import ErrorHandlers.NotFoundException;
 
 @RestController
 @RequestMapping("/api/blogpost")
@@ -30,18 +27,19 @@ public class BlogPostController {
 	
 	private final BlogPostService blogPostService;
 	
-
 	public BlogPostController(BlogPostService blogPostService) {
 		this.blogPostService = blogPostService;
 	}
-
+	
+	
 
 	@GetMapping
-	public List<BlogPostDTO>getAllPosts(){
+	public List<BlogPostResponse>getAllPosts(){
 		return blogPostService.findAllBlogPosts();
 	}
+	
 	@GetMapping("/basic")
-	public List<BlogPostBasicDTO>getAllBasicPosts(){
+	public List<BlogPostBasicResponse>getAllBasicPosts(){
 		return blogPostService.findAllBasicBlogPosts();
 	}
 	
@@ -49,72 +47,47 @@ public class BlogPostController {
 	
 	@GetMapping("/{id}")
 	public BlogPostDTO getBlogPostById(@PathVariable String id) {
-	Optional<BlogPostEntity> optional =	blogPostService.findById(id);
-	if(optional.isEmpty()) throw new NotFoundException("Post not found");
-	return blogPostService.blogPostEntityToDTO(optional.get());
+//	Optional<BlogPostEntity> optional =	blogPostService.findById(id);
+//	if(optional.isEmpty()) throw new NotFoundException("Post not found");
+//	return blogPostService.blogPostEntityToDTO(optional.get());
+		return null;
 	}
 	
 	
-//	@GetMapping("/images/{id}")
-//	public ResponseEntity<List<String>>getPostImages(@PathVariable String id){
-//		BlogPost post = blogPostService.findById(id).get();
-//		Encoder encoder = Base64.getEncoder();
-//		if(post != null) {
-//			System.out.println("Mam posta");
-//			List<String> idsList = new ArrayList<>(); 
-//			for(int i=0;i<post.getImageIds().size();++i) 
-//				idsList.add(post.getImageIds().get(i));
-//			System.out.println("Lista id" + idsList);
-//			
-//			List<String> base64Images = idsList.stream().map(imageId->
-//				encoder.encodeToString(imageService.getImageById(imageId).getData()))
-//					.collect(Collectors.toList());
-//				return ResponseEntity.ok(base64Images);	
-//		}
-//		else throw new RuntimeException("Incorect Blog id");
-//	}
-	
-//	@PostMapping
-//	public BlogPost createPost(@RequestParam("title") String title, 
-//							   @RequestParam("content")String content, 
-//							   @RequestParam("images")List<MultipartFile> images) {
-//		
-//		List<String>imageIds = new ArrayList<>();
-//		
-//		images.stream().forEach(image ->{
-//			try {
-//				Image createdImage = imageService.storeImage(image);
-//				imageIds.add(createdImage.getId());
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-//		);
-//
-//		BlogPost createdBlogPostDTO = new BlogPost(title, content, imageIds);
-//		return blogPostService.storeBlogPost(createdBlogPostDTO);
-//		
-//	}
+	//POST CREATE BLOG POST --------------------------------------------------------------------
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public BlogPostDTO createPost(@RequestParam("title") String title, 
+	public BlogPostResponse createPost(@RequestParam("title") String title, 
 							   @RequestParam("content")String content, 
-							   @RequestParam("images")List<MultipartFile> images) {
+							   @RequestParam("author")String author, 
+							   @RequestParam("rating")int rating,
+							   @RequestParam("images")List<MultipartFile> images)
+							    {
 		
-		if(blogPostService.validateDuplicateTitle(title)) throw new NotFoundException("Post with this title already exists");
-		BlogPostEntity postEntity = blogPostService.createBlogPost(title,content,images);
-		return blogPostService.blogPostEntityToDTO(postEntity);
+		System.out.println("Jestem w kreacie1");
+		
+		//if(blogPostService.validateDuplicateTitle(title)) throw new NotFoundException("Post with this title already exists");
+		BlogPostEntity postEntity = new BlogPostEntity();
+		try {
+			postEntity = blogPostService.createBlogPost(title,content, author,images,rating);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return blogPostService.blogPostEntityToResponse(postEntity);
 	}
+	
+	// DELETE BLOG POST --------------------------------------------------------------------------
 	
 	@DeleteMapping("/{id}")
 	public void deletePost(@PathVariable String id) {
 		blogPostService.deletePost(id);
 	}
 	
+	// PUT UPDATE BLOG POST ---------------------------------------------------------------------------
+	
 	@PutMapping
-	public BlogPostDTO updatePost(
+	public BlogPostResponse updatePost(
 			  @RequestParam("id") String id,
 			  @RequestParam("title") String title, 
 			  @RequestParam("blogDate")LocalDateTime blogDate,
@@ -126,6 +99,6 @@ public class BlogPostController {
 		System.out.println("jestem tu gdzie patrzwe kontroler/nfgsdfsd/nfdsfsdfsd");
 
 		BlogPostEntity postToUpdate = blogPostService.updateBlogPost(id, title,content,blogDate,newImages,deletedIndexes);
-		return blogPostService.blogPostEntityToDTO(postToUpdate);
+		return blogPostService.blogPostEntityToResponse(postToUpdate);
 	}
 }

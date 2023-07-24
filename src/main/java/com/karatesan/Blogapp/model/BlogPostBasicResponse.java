@@ -8,11 +8,12 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class BlogPostBasicDTO {
+public class BlogPostBasicResponse {
 	@Id
 	private String id;
 	private String title;
 	private String content;
 	private LocalDateTime blogDate;
-	private String poster;
+	private int rating;
+	private ResponseImage poster;
 }
