@@ -30,11 +30,12 @@ const Home = () => {
       <div className="grid md:grid-cols-2 grid-cols-1">
         {blogPosts.map((post, index) => {
           const row = index % 2 === 1 ? rowRef.current++ : rowRef.current;
-          console.log(row);
           return (
-            <div key={post.id} className="card-container">
+            <Link key={post.id} to={`/blog/${post.id}`}>
+            <div  className="card-container">
               <BlogPostcCard post={post} row={row} />
             </div>
+            </Link>
           );
         })}
       </div>

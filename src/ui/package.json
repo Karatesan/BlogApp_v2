@@ -12,6 +12,8 @@
   "dependencies": {
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.4",
+    "dompurify": "^3.0.5",
+    "escape-html": "^1.0.3",
     "image-extensions": "^1.1.0",
     "is-url": "^1.2.4",
     "quill-image-resize-module-react": "^3.0.0",

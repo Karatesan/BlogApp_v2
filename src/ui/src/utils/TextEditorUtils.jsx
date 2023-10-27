@@ -28,7 +28,7 @@ export const alignToJustify = (align) => {
 //---------------------------------------------------------------------------------
 
 export const toFloat = (float) => {
-  return float === "wrap_right" ? "float-right" : "float-left";
+  return float === "wrap_right" ? "right" : "left";
 };
 
 //Buttons ----------------------------------------------------------------
@@ -39,9 +39,12 @@ const Icon = ({ children }) => {
 };
 //-------------------------------------------------------------------
 
+//export const StyledButton = ({ editor, format, icon, buttonType })
+
 export const MarkButton = ({ editor, format, icon }) => {
   return (
     <button
+      className="flex justify-center items-center p-1 hover:bg-gray-200 rounded-md shadow-inner"
       onMouseDown={(event) => {
         event.preventDefault();
         CustomEditor.toggleMark(editor, format);
@@ -58,6 +61,7 @@ export const MarkButton = ({ editor, format, icon }) => {
 export const BlockButton = ({ editor, format, icon }) => {
   return (
     <button
+      className="flex justify-center items-center p-1 hover:bg-gray-200 rounded-md shadow-inner"
       onMouseDown={(event) => {
         event.preventDefault();
         CustomEditor.toggleBlock(editor, format);
@@ -74,6 +78,7 @@ export const BlockButton = ({ editor, format, icon }) => {
 export const InsertImageButton = ({ setImageInput }) => {
   return (
     <button
+      className="flex justify-center items-center p-1 hover:bg-gray-200 rounded-md shadow-inner"
       onMouseDown={(event) => {
         event.preventDefault();
         setImageInput(true);
@@ -89,13 +94,7 @@ export const InsertImageButton = ({ setImageInput }) => {
 
 export const BlockElement = ({ attributes, children, element }) => {
   const isFloating = element.float ? true : false;
-  console.log("floating " + isFloating);
-  const style =
-    element.type !== "image"
-      ? { textAlign: element.align }
-      : isFloating
-      ? { float: toFloat(element.float) }
-      : { textAlign: element.align };
+  const style = getStyles(element);
 
   switch (element.type) {
     case "block-quote":
@@ -150,17 +149,13 @@ export const BlockElement = ({ attributes, children, element }) => {
           {children}
         </ol>
       );
-    case "image":
+    case "image": {
       return (
-        <Image
-          style={style}
-          attributes={attributes}
-          element={element}
-          isFloating={isFloating}
-        >
+        <Image style={style} attributes={attributes} element={element}>
           {children}
         </Image>
       );
+    }
     default:
       return (
         <p style={style} {...attributes}>
@@ -194,11 +189,12 @@ export const Leaf = ({ attributes, children, leaf }) => {
 
 //-------------------------------------------------------------------
 
-export const Image = ({ attributes, element, style, isFloating, children }) => {
+export const Image = ({ attributes, element, style, children }) => {
   const editor = useSlateStatic();
   const path = ReactEditor.findPath(editor, element);
   const selected = useSelected();
   const focused = useFocused();
+  const isFloating = style.textAlign ? false : true;
   return (
     <div
       {...attributes}
@@ -209,9 +205,8 @@ export const Image = ({ attributes, element, style, isFloating, children }) => {
     >
       <img
         src={element.url}
-        className={`z-0 max-w-[100%] max-h-[20em] ml-4 mr-4 mb-4 ${
-          isFloating ? style.float : ""
-        }`}
+        className={`z-0 max-w-[100%] max-h-[20em] ml-4 mr-4 mb-4 `}
+        style={style}
       />
 
       {children}
@@ -273,6 +268,7 @@ export const CustomEditor = {
   //------------------------------------------------------------------------
 
   toggleBlock(editor, format) {
+    console.log(editor);
     const isActive = CustomEditor.isBlockActive(
       editor,
       format,
@@ -298,7 +294,6 @@ export const CustomEditor = {
       newProperties = {
         ...newProperties,
         align: isActive ? undefined : format,
-        float: undefined,
       };
     } else if (WRAP_TEXT_TYPES.includes(format)) {
       newProperties = {
@@ -312,7 +307,7 @@ export const CustomEditor = {
         type: isActive ? "paragraph" : isList ? "list-item" : format,
       };
     }
-    //Transforms.setNodes < Element > (editor, newProperties);
+    //setNodes ustawia nodesy w konkretnej lokalziacji, jezeli sie nie poda lokalziacji, to bierze z edytora parametr selection - to co jest zazanczone myszka
     Transforms.setNodes(editor, newProperties, {
       match: (n) => Editor.isBlock(editor, n) && Element.isElement(n),
     });
@@ -322,4 +317,26 @@ export const CustomEditor = {
       Transforms.wrapNodes(editor, block);
     }
   },
+};
+
+export const getStyles = (element) => {
+  const isFloating = element.float ? true : false;
+  const style =
+    element.type !== "image"
+      ? { textAlign: element.align }
+      : isFloating
+      ? { float: toFloat(element.float) }
+      : { textAlign: element.align };
+  return style;
+};
+
+export const getStylesCSS = (element) => {
+  const isFloating = element.float ? true : false;
+  const style =
+    element.type !== "image"
+      ? { "text-align": element.align }
+      : isFloating
+      ? { float: toFloat(element.float) }
+      : { "text-align": element.align };
+  return style;
 };

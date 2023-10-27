@@ -50,8 +50,7 @@ public class ImageService {
 	 public ResponseImage imageToResponseImage(Image image) {
 		 
 		 ResponseImage responseImage = new ResponseImage(image.getId(), 
-				 image.getName(), 
-				 image.getDescription(), 
+				 image.getName(),  
 				 image.getSize(), 
 				 getImageDataAsBase64(image.getData()));
 		 return responseImage;

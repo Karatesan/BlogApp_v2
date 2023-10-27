@@ -52,17 +52,11 @@ const SlateTextEditor = ({ post, setPost }) => {
     <Slate
       editor={editor}
       initialValue={initialValue}
-      onChange={(value) => {
-        const isAstChange = editor.operations.some(
-          (op) => "setSelection" !== op.type
-        );
-        if (isAstChange) {
-          const content = JSON.stringify(value);
-          setPost({ ...post, content: content });
-        }
+      onChange={() => {
+        setPost({ ...post, content: editor });
       }}
     >
-      <div>
+      <div className="relative flex justify-around items-center py-[25px] w-[42vw] h-[40px] shadow-md rounded-md mb-4 bg-gray-50">
         <MarkButton editor={editor} format="bold" icon="format_bold" />
         <MarkButton editor={editor} format="italic" icon="format_italic" />
         <MarkButton
@@ -107,7 +101,9 @@ const SlateTextEditor = ({ post, setPost }) => {
           format="wrap_right"
           icon="format_align_right"
         />
-        {imageInput && <ImageInput handleSelectedItems={handleSelectedItems} />}
+        {imageInput && (
+          <ImageInput className="" handleSelectedItems={handleSelectedItems} />
+        )}
       </div>
 
       <Editable

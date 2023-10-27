@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BlogPostDTO {
 	
+	//do wywalenia?
+	
 	@Id
 	private String id;
 	private String author;

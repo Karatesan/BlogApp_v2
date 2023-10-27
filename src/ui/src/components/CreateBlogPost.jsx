@@ -4,12 +4,13 @@ import { createUrl } from "../utils/utils";
 import { Link, useNavigate } from "react-router-dom";
 import TextEditor from "./TextEditor";
 import SlateTextEditor from "./SlateTextEditor";
+import { serialize } from "../utils/SlateSerializer";
 
 const initialData = {
   title: "",
   content: "Create your post...",
   author: "",
-  poster: [],
+  poster: null,
   rating: "",
   images: [],
 };
@@ -59,24 +60,24 @@ const CreateBlogPost = () => {
   const handleUploadPost = async (event) => {
     event.preventDefault();
     setCreating(true);
+    setError(null);
     try {
       const formData = new FormData();
       post.images.forEach((image, index) => {
-        formData.append("images", image.image);
-        formData.append("descriptions", image.description);
-      });
-      console.log(post.images);
-      //formData.append("poster", post.poster[0].image);
-      formData.append("author", "Anonymous");
-      post.images.forEach((image) => {
-        formData.append("description", image.description);
+        formData.append("images", image);
       });
 
-      const elements = event.target.elements;
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements[i];
-        if (element.name) formData.append(element.name, element.value);
-      }
+      //formData.append("poster", post.poster[0].image);
+      formData.append("author", "Anonymous");
+      formData.append("title", post.title);
+      formData.append("rating", post.rating);
+      formData.append("content", serialize(post.content));
+
+      // const elements = event.target.elements;
+      // for (let i = 0; i < elements.length; i++) {
+      //   const element = elements[i];
+      //   if (element.name) formData.append(element.name, element.value);
+      // }
 
       const response = await fetch("api/blogpost", {
         method: "POST",
@@ -85,12 +86,11 @@ const CreateBlogPost = () => {
 
       // Handle the response as needed
       setPost(initialData);
-    } catch (error) {
-      console.log("w errorze");
-      setError(error);
+      navigate("/");
       setCreating(false);
+    } catch (error) {
+      setError(error.message);
     }
-    if (!error) navigate("/");
   };
 
   //------------------------------------------------------------------------
@@ -102,16 +102,24 @@ const CreateBlogPost = () => {
           creating ? "opacity-50 " : "opacity-100"
         }`}
       >
-        {creating && (
+        {creating && !error && (
           <div className="flex flex-col items-center fixed top-[50%] left-[50%] -translate-x-[50px] w-[100px] text-[20px]">
             Saving
             <div className="rounded-full border-4 border-blue-500 border-dashed animate-spin h-[20px] w-[20px]"></div>
           </div>
         )}
         {error && (
-          <div className="flex flex-col items-center fixed top-[50%] left-[50%] -translate-x-[50px] w-[400px] text-[20px]">
-            <h2>Oops, something went wrong</h2>
-            <p>{error}</p>
+          <div className="z-[100] bg-white flex flex-col items-center justify-center fixed top-[50%] left-[50%] -translate-x-[200px] -translate-y-[100px] text-[20px] border-2 border-solid border-red-500 w-[400px] h-[200px]">
+            <h2 className="text-[16px] text-black">ERROR KURWA!!!!</h2>
+            <p className="text-[16px] text-black">{error}</p>
+            <button
+              onClick={() => {
+                setError(null);
+                setCreating(false);
+              }}
+            >
+              Usuń Error Kurwo
+            </button>
           </div>
         )}
         <h1 className="font-poppins text-[24px] mb-4">Create new post</h1>
@@ -141,13 +149,32 @@ const CreateBlogPost = () => {
           <p>Rating</p>
           <input
             type="number"
+            min="1"
             max="10"
+            onChange={(event) =>
+              setPost({ ...post, rating: event.target.value })
+            }
+            value={post.rating}
             required
             className="border-2 border-solid border-gray-200 rounded-lg shadow-md my-2 p-2"
             name="rating"
           />
         </label>
         <br />
+
+        <div className="flex justify-center flex-wrap relative w-full">
+          {post.images.map((image, index) => (
+            <div key={index} className={` `}>
+              <div className="relative">
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt={`Image ${index}`}
+                  className=" w-[100px] h-[100px] object-contain my-4"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
         <SlateTextEditor post={post} setPost={setPost} />
         <button
           type="submit"

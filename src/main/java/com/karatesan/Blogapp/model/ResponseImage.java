@@ -13,7 +13,6 @@ public class ResponseImage {
     @Id
     private String id;
     private String name;
-    private String description;
     private long size;
     private String base64image;
     

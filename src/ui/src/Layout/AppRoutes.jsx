@@ -4,6 +4,7 @@ import Layout from "./Layout";
 import Home from "../components/Home";
 import UpdatePost from "../components/UpdatePost";
 import CreateBlogPost from "../components/CreateBlogPost";
+import BlogPost from "../components/BlogPost";
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -12,6 +13,7 @@ const AppRoutes = () => {
           <Route path="/" element={<Home />} />
           <Route path="/UpdatePost/:postId" element={<UpdatePost />}></Route>
           <Route path="/CreateNewPost" element={<CreateBlogPost />}></Route>
+          <Route path="/blog/:postId" element ={<BlogPost />}></Route>
         </Route>
       </Routes>
     </BrowserRouter>

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.karatesan.Blogapp.errorHandlers.NotFoundException;
 import com.karatesan.Blogapp.model.BlogPostBasicResponse;
 import com.karatesan.Blogapp.model.BlogPostDTO;
 import com.karatesan.Blogapp.model.BlogPostEntity;
@@ -25,7 +26,6 @@ import com.karatesan.Blogapp.model.Image;
 import com.karatesan.Blogapp.model.ResponseImage;
 import com.karatesan.Blogapp.repositories.BlogPostRepository;
 
-import ErrorHandlers.NotFoundException;
 import ch.qos.logback.core.joran.conditional.IfAction;
 
 @Service
@@ -134,11 +134,13 @@ public class BlogPostService {
 	// BlogPost entity (database model) to BlogPost responmse (Model sent to client) ------------------------------------------------
 	
 	public BlogPostResponse blogPostEntityToResponse(BlogPostEntity post) {
-		
-		ResponseImage poster = imageService.imageToResponseImage(post.getPoster());
-		List<ResponseImage>galleryImages = post.getGallery().stream().map(image->imageService.imageToResponseImage(image)).collect(Collectors.toList());
-		BlogPostResponse newPost = new BlogPostResponse(post.getId(), post.getAuthor(),post.getTitle(), post.getContent(), post.getBlogDate(), post.getUpdateBlogDate(), poster, post.getRating(), galleryImages,post.getComments());
-		return newPost;
+		if(post!=null) {
+			ResponseImage poster = imageService.imageToResponseImage(post.getPoster());
+			List<ResponseImage>galleryImages = post.getGallery().stream().map(image->imageService.imageToResponseImage(image)).collect(Collectors.toList());
+			BlogPostResponse newPost = new BlogPostResponse(post.getId(), post.getAuthor(),post.getTitle(), post.getContent(), post.getBlogDate(), post.getUpdateBlogDate(), poster, post.getRating(), galleryImages,post.getComments());
+			return newPost;
+		}
+		return null;
 }
 	
 	//BlogPost Basic - returns model for main page - containing only poster, no gallery --------------------------------------

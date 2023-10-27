@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { DoNotDisturb } from "@mui/icons-material";
 
+//selected images - state from parent component where u hold image 
+//multiple - do you allow to upload multiple files at once
+//handleSelectedItems - handler for upload - same with delete
+
 const ImageUploader = ({
   multiple,
   title,
   selectedImages,
   handleSelectedItems,
   deleteImage,
-  handleDescription,
-  description,
 }) => {
   return (
     <div className="flex flex-col items-center mt-6 border-2 border-gray-300 border-solid rounded-xl shadow-md p-5 w-[50%]">

@@ -29,6 +29,7 @@ public class BlogPostEntity {
 		private int rating;
 		private List<Image> gallery;
 		private List<Comment> comments;
+		
 		public BlogPostEntity(String author, String title, String content, LocalDateTime blogDate,
 				LocalDateTime updateBlogDate, Image poster, int rating, List<Image> gallery, List<Comment> comments) {
 			super();

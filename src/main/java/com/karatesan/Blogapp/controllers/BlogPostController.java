@@ -20,6 +20,7 @@ import com.karatesan.Blogapp.model.BlogPostDTO;
 import com.karatesan.Blogapp.model.BlogPostEntity;
 import com.karatesan.Blogapp.model.BlogPostResponse;
 import com.karatesan.Blogapp.services.BlogPostService;
+import com.karatesan.Blogapp.errorHandlers.NotFoundException;
 
 @RestController
 @RequestMapping("/api/blogpost")
@@ -31,8 +32,6 @@ public class BlogPostController {
 		this.blogPostService = blogPostService;
 	}
 	
-	
-
 	@GetMapping
 	public List<BlogPostResponse>getAllPosts(){
 		return blogPostService.findAllBlogPosts();
@@ -46,11 +45,13 @@ public class BlogPostController {
 	//metoda do zwrocenia czesci postow (pagination) + zrobic osobny request zawierajacy tylko poster bez galerii
 	
 	@GetMapping("/{id}")
-	public BlogPostDTO getBlogPostById(@PathVariable String id) {
-//	Optional<BlogPostEntity> optional =	blogPostService.findById(id);
-//	if(optional.isEmpty()) throw new NotFoundException("Post not found");
-//	return blogPostService.blogPostEntityToDTO(optional.get());
-		return null;
+	public BlogPostResponse getBlogPostById(@PathVariable String id) {
+	Optional<BlogPostEntity> optional =	blogPostService.findById(id);
+	//if(optional.isEmpty()) throw new NotFoundException("Post not found");
+	
+	BlogPostResponse postResponse = blogPostService.blogPostEntityToResponse(optional.orElse(null));
+	return postResponse;
+		
 	}
 	
 	
@@ -61,7 +62,7 @@ public class BlogPostController {
 	public BlogPostResponse createPost(@RequestParam("title") String title, 
 							   @RequestParam("content")String content, 
 							   @RequestParam("author")String author, 
-							   @RequestParam("rating")int rating,
+							   @RequestParam("rating")String rating,
 							   @RequestParam("images")List<MultipartFile> images)
 							    {
 		
@@ -70,7 +71,7 @@ public class BlogPostController {
 		//if(blogPostService.validateDuplicateTitle(title)) throw new NotFoundException("Post with this title already exists");
 		BlogPostEntity postEntity = new BlogPostEntity();
 		try {
-			postEntity = blogPostService.createBlogPost(title,content, author,images,rating);
+			postEntity = blogPostService.createBlogPost(title,content, author,images,Integer.parseInt(rating));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
